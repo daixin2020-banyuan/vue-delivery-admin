@@ -1,0 +1,20 @@
+.loading-container{
+    position : fixed;
+    top :0;
+    left :0;
+    z-index : 99999;
+    display : flex;
+    align-items : center;
+    justify-content : center;
+    width : 100vw;
+    height : 100vh;
+    background-color : rgba(186, 183, 183, 0.3);
+    img{
+        display : flex;
+        flex-direction : column;
+        justify-content : center;
+        justify-items : center;
+        width : 100px;
+        height : 100px;
+    }
+}
