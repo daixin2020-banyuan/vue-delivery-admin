@@ -265,11 +265,11 @@ export default {
       this.updateRest = row;
       this.title = row.name["zh-CN"];
       // 数据初始化
-      this.updatedName = JSON.parse(JSON.stringify(_.get(row, "name", {})));
-      this.updateTagArr = _.get(row, "tags", []);
-      this.timezone = _.get(row, "timezone", "");
+      this.updatedName = _.clone(_.get(row, "name", {}));
+      this.updateTagArr = _.clone(_.get(row, "tags", []));
+      this.timezone = _.clone(_.get(row, "timezone", ""));
       this.renderBusinessTime(row);
-      // this.time();
+      this.time();
     },
 
     // 语言选中function
