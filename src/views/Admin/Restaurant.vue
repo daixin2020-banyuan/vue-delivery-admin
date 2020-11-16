@@ -386,6 +386,7 @@ export default {
 
     //关闭modal后初始化数据
     closeModal() {
+      this.selectTag = "";
       this.updateTagArr = [];
       this.langValue = "";
       this.langOptionsValue = "";
@@ -413,12 +414,7 @@ export default {
       this.$store.commit(types.HIDE_LOADING);
     }
   },
-  updated() {
-    // console.log("总数据====>", this.restList);
-    // console.log("updatedHours", this.updatedHours);
-    // console.log("businessTime", this.businessTime);
-    // console.log("updatedName", this.updatedName);
-  },
+
   destroyed() {
     if (this.time) {
       clearInterval(this.time);
@@ -429,7 +425,6 @@ export default {
 
 <style lang="scss">
 .el-table {
-  // background-color: black;
   .el-pagination {
     position: absolute;
     right: 0;

@@ -15,24 +15,21 @@
               :collapse="isCollapse"
               router
             >
-              <el-menu-item
-                index="/admin/restaurant"
-                @click="changeTags('restaurant')"
-              >
+              <el-menu-item index="/admin/restaurant">
                 <i class="el-icon-menu"></i>
                 <span slot="title">
                   餐馆
                 </span>
               </el-menu-item>
 
-              <el-menu-item index="/admin/menu" @click="changeTags('menu')">
+              <el-menu-item index="/admin/menu">
                 <i class="el-icon-tableware"></i>
                 <span slot="title">
                   菜单
                 </span>
               </el-menu-item>
 
-              <el-menu-item index="/admin/order" @click="changeTags('order')">
+              <el-menu-item index="/admin/order">
                 <i class="el-icon-shopping-cart-full"></i>
                 <span slot="title">订单</span>
               </el-menu-item>
@@ -59,7 +56,10 @@
         <el-header height="70px"></el-header>
         <el-main>
           <div class="main-nav">
-            <span>Admin</span> <span>/</span> <span>{{ tags }}</span>
+            <el-breadcrumb separator="/">
+              <el-breadcrumb-item>Admin</el-breadcrumb-item>
+              <el-breadcrumb-item>{{ tags }}</el-breadcrumb-item>
+            </el-breadcrumb>
           </div>
           <router-view />
         </el-main>
@@ -75,13 +75,12 @@ export default {
   data() {
     return {
       widthSize: "200px",
-      isCollapse: true,
-      tags: "restaurant"
+      isCollapse: true
     };
   },
-  methods: {
-    changeTags(value) {
-      this.tags = value;
+  computed: {
+    tags() {
+      return this.$route.name.toLowerCase();
     }
   }
 };
