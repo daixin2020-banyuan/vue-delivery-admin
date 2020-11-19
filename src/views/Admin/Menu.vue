@@ -6,9 +6,10 @@
         filterable
         placeholder="请选择"
         @change="selectRest"
+        :filter-method="pinyingMatch"
       >
         <el-option
-          v-for="item in newRestList"
+          v-for="item in brand"
           :key="item.value"
           :label="item.label"
           :value="item.value"
@@ -17,7 +18,13 @@
       </el-select>
     </div>
 
-    <el-table :data="food" stripe style="width: 100%" v-loading="loading">
+    <el-table
+      :data="food"
+      stripe
+      style="width: 100%"
+      v-loading="loading"
+      :filter-method="pinyingMatch"
+    >
       <el-table-column prop="name.zh-CN" width="400">
         <template slot="header">
           <div class="menu-name-input">
@@ -40,12 +47,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="address" label="状态">
+      <el-table-column label="状态">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.available"
             active-color="#13ce66"
             inactive-color="#ff4949"
+            :disabled="$permission()"
             @change="
               v => {
                 handleSwitch(v, scope.row);
@@ -72,8 +80,8 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import _ from "lodash";
-import { v4 as uuidv4 } from "uuid";
+// import _ from "lodash";
+import pinyingMatch from "pinyin-match";
 
 export default {
   name: "Menu",
@@ -81,74 +89,71 @@ export default {
     return {
       loading: false,
       selectValue: "", //下拉框的值
+      brand: [],
       keyword: "",
       restaurantId: "", //餐馆id
       currentPage: 1, //当前页
       pageSize: 10 //单页显示数
     };
   },
-  // watch: {
-  //   food: {
-  //     handler(newv, oldv) {
-  //       console.log("food list change", newv, oldv);
-  //       let saa = this.food.slice(
-  //         (this.currentPage - 1) * this.pageSize,
-  //         this.currentPage * this.pageSize
-  //       );
-  //       console.log("deal", saa);
-  //     },
-  //     deep: true
-  //   }
-  // },
+
   computed: {
     ...mapState({
-      restList: state => state.Rest.restList,
+      restName: state => state.Rest.restName,
       food: state => state.Menu.food,
       count: state => state.Menu.count
-    }),
-
-    /* 重构restList 按需求排序*/
-    newRestList() {
-      const newRestList = _.map(this.restList, item => {
-        return {
-          label: _.get(item, "name.zh-CN", ""),
-          key: uuidv4(),
-          value: item._id
-        };
-      });
-      return newRestList;
+    })
+  },
+  watch: {
+    restName(val) {
+      this.brand = val;
     }
   },
   created() {
-    this.setRest();
-    console.log(this.food);
+    this.$store.dispatch("setRest");
   },
   methods: {
     ...mapActions(["setRest", "setMenu", "updateFood"]),
 
     selectRest(value) {
       this.restaurantId = value;
-      console.log(this.$refs.inputRef);
       this.$refs.inputRef.value = "";
       this.keyword = "";
       this.currentPage = 1;
       this.renderFood();
+      this.brand = this.restName;
+    },
+    //下拉框设置拼音模糊搜索
+    pinyingMatch(val) {
+      if (val) {
+        let result = [];
+        //
+        this.restName.forEach(e => {
+          var m = pinyingMatch.match(e.label, val);
+          if (m) {
+            result.push(e);
+          }
+        });
+        //搜索到相应的数据就把符合条件的n个数据赋值newRestList
+        this.brand = result;
+      } else {
+        //没有搜索到数据，就还展示所有的brand
+        this.brand = this.restName;
+      }
     },
 
     /**加载点击第几页 */
     handlePageChange(v) {
       this.currentPage = v;
-      // console.log("currentPage====>", this.currentPage);
       this.renderFood();
     },
     handleSizeChange(v) {
       this.pageSize = v;
       this.currentPage = 1;
-      // console.log("pageSize======>", v);
       this.renderFood();
     },
-    renderFood() {
-      this.setMenu({
+    async renderFood() {
+      await this.setMenu({
         id: this.restaurantId,
         page: this.currentPage,
         limit: this.pageSize,

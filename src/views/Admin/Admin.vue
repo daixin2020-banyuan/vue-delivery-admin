@@ -29,13 +29,24 @@
                 </span>
               </el-menu-item>
 
-              <el-menu-item index="/admin/order">
+              <el-menu-item index="/admin/order" v-if="checkPermission()">
                 <i class="el-icon-shopping-cart-full"></i>
                 <span slot="title">订单</span>
               </el-menu-item>
             </el-menu>
           </div>
-          <div :style="{ width: isCollapse ? '80px' : '200px' }">
+          <div>
+            <el-button
+              type="info"
+              style="margin-top: 300px;  background: #333;  border: solid 1px #333;"
+              @click="logOut"
+              >登出</el-button
+            >
+          </div>
+          <div
+            :style="{ width: isCollapse ? '80px' : '200px' }"
+            class="radio-container"
+          >
             <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">
               <el-radio-button
                 :label="false"
@@ -69,6 +80,9 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+import { getStorage } from "@/common/utils.js";
+import _ from "lodash";
 export default {
   name: "Admin",
   components: {},
@@ -81,6 +95,18 @@ export default {
   computed: {
     tags() {
       return this.$route.name.toLowerCase();
+    }
+  },
+  methods: {
+    ...mapActions(["loginOut"]),
+    logOut() {
+      this.loginOut();
+    },
+    checkPermission() {
+      const role = _.get(getStorage("role"), "role", "");
+      if (role !== "visitor") {
+        return true;
+      }
     }
   }
 };
@@ -97,7 +123,8 @@ export default {
 }
 
 .el-aside {
-  height: 788px;
+  // height: 100vh;
+  min-height: 788px;
   color: #333;
   text-align: center;
   background-color: rgb(31, 31, 31);
@@ -108,7 +135,10 @@ export default {
   color: #333;
   // text-align: left;
   overflow: scroll;
-  height: 710px;
+  display: block;
+  flex: 1;
+  flex-basis: auto;
+  padding: 20px;
   .main-nav {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -121,6 +151,7 @@ export default {
     font-feature-settings: "tnum", "tnum";
     font-size: 14px;
     margin: 16px 0;
+    width: 100%;
   }
 }
 
@@ -140,7 +171,7 @@ body > .el-container {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  // height: 100%;
   // width: 200px;
 }
 .el-menu-vertical-demo {
@@ -172,5 +203,31 @@ body > .el-container {
   .el-menu {
     border: none;
   }
+}
+.radio-container {
+  display: flex;
+  align-content: center;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 54px;
+}
+
+.el-radio-button:first-child .el-radio-button__inner {
+  background: #333;
+  border: solid 1px #333;
+  color: #fff;
+  // position: fixed;
+  // left: calc(100vw -1420px);
+  // top: calc(100vh - 110px);
+}
+.el-radio-button:last-child .el-radio-button__inner {
+  background: #333;
+  border: solid 1px #333;
+  color: #fff;
+  // position: fixed;
+  // left: calc(100vw -1420px);
+  // top: calc(100vh - 110px);
 }
 </style>

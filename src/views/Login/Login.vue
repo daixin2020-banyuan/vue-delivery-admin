@@ -25,10 +25,7 @@
         <el-form-item
           label="密码"
           prop="pass"
-          :rules="[
-            { required: true, message: '年龄不能为空' },
-            { type: 'number', message: '年龄必须为数字值' }
-          ]"
+          :rules="[{ required: true, message: '密码不能为空' }]"
         >
           <el-input type="password" v-model="ruleForm.pass" autocomplete="off">
           </el-input>
@@ -43,6 +40,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "Login",
   data() {
@@ -54,8 +52,24 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["login"]),
     submitForm() {
-      console.log("submitForm");
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          const info = {
+            username: this.ruleForm.username,
+            password: this.ruleForm.pass
+          };
+          console.log("login.vue", info);
+          this.login(info);
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    resetForm() {
+      this.$refs.ruleForm.resetFields();
     },
     showDetails() {
       console.log("showDetails");

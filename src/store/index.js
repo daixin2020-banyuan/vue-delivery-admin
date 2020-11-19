@@ -9,6 +9,8 @@ import Menu from "./menu";
 
 import Order from "./order";
 
+import login from "./login";
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -19,6 +21,7 @@ export default new Vuex.Store({
     loading,
     Rest,
     Menu,
-    Order
+    Order,
+    login
   }
 });

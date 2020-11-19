@@ -83,7 +83,6 @@ export default {
       date: [], //X轴的数据
       finalArr: [], //处理后的数据
       loadingFlag: false,
-      totalPersonOrder: 0,
       pickerOptions: {
         shortcuts: [
           {
@@ -137,13 +136,17 @@ export default {
     async changeDate(value) {
       this.start = moment(value[0]).format("YYYY-MM-DD");
       this.end = moment(value[1]).format("YYYY-MM-DD");
+      console.log("this.start=====>", this.start);
+      console.log("this.end=====>", this.end);
+
       this.loadingFlag = true;
       await this.setOrder({
-        start: value[0].toString(),
-        end: value[1].toString()
+        start: value[0].toISOString(),
+        end: value[1].toISOString()
       });
       this.personOrder();
-      this.dailyOrder();
+      // this.dailyOrder();
+      this.test();
       this.loadingFlag = false;
     },
 
@@ -156,63 +159,38 @@ export default {
       this.date = newDataArr;
     },
 
-    //计算每天的单量
-    dailyOrder() {
-      this.daily();
-      // console.log("x轴的日期====>", this.date);
+    //目标数据 {date:11-20,count:0}
 
-      // console.log("======in order计算======");
-      let arr = _.map(this.orderList, item => {
+    test() {
+      this.daily();
+      let data = _(this.orderList)
+        .map(item => {
+          return { date: moment(item.updatedAt).format("YYYY-MM-DD") };
+        })
+        .groupBy("date")
+        .value();
+      // console.log(data);
+      const count = _.map(data, (v, k) => {
         return {
-          count: _.get(item, "cart", "").length,
-          date: moment(item.updatedAt).format("YYYY-MM-DD")
+          date: k,
+          value: v.length
         };
       });
-      let map = {},
-        newArr = [];
-      for (let i = 0; i < arr.length; i++) {
-        let ai = arr[i];
-        if (!map[ai.date]) {
-          newArr.push({
-            date: ai.date,
-            count: ai.count
-          });
-          map[ai.date] = ai;
-        } else {
-          for (let j = 0; j < newArr.length; j++) {
-            let dj = newArr[j];
-            if (dj.date == ai.date) {
-              dj.count = dj.count + ai.count;
-              break;
-            }
-          }
-        }
-      }
-      // console.log("订单量====>", newArr);
-      // 0: {date: "2020-11-07", count: 6}
-      // 1: {date: "2020-11-11", count: 1}
-      // 2: {date: "2020-11-12", count: 20}
-      // 3: {date: "2020-11-13", count: 73}
+      // console.log(count);
       let arr2 = [];
       _.forEach(this.date, i => {
-        _.forEach(newArr, j => {
-          if (j.date === i.date) {
-            arr2.push({
-              date: i.date,
-              count: j.count
-            });
-          } else {
-            arr2.push({
-              date: i.date,
-              count: 0
-            });
-          }
+        _.forEach(count, j => {
+          arr2.push({
+            date: i.date,
+            count: j.date == i.date ? j.value : 0
+          });
         });
       });
       this.finalArr = computeArr(arr2);
-      // console.log("处理过的最终数据=====.>", this.finalArr);
+
       this.chartData.rows = computeArr(arr2);
     },
+
     //计算下单人数
     personOrder() {
       let data = _(this.orderList)
@@ -223,12 +201,7 @@ export default {
         })
         .value();
       // 计算总的订单量
-      // console.log(data);
-      let total = 0;
-      _.forEach(this.orderList, i => {
-        total += i.cart.length;
-      });
-      this.totalPersonOrder = total;
+      // console.log("personOrder", data);
 
       const userCount = _.map(data, (v, k) => {
         return {
@@ -236,7 +209,7 @@ export default {
           value: v.length
         };
       });
-      console.log(userCount);
+      // console.log(userCount);
       // 0: {name: "zhoumengruu", value: 18, percent: "14.29%"}
       // 1: {name: "tangdian0925_", value: 1, percent: "0.79%"}
       // 2: {name: "undefined", value: 18, percent: "14.29%"}

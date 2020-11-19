@@ -27,7 +27,7 @@ const Menu = {
           limit,
           keyword
         });
-        console.log("餐馆的菜单列表=====》", "第" + page + "页", result);
+        // console.log("餐馆的菜单列表=====》", "第" + page + "页", result);
 
         commit(types.RECORD_MENU, {
           food: result.list,

@@ -1,13 +1,11 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
+import { getStorage } from "@/common/utils";
+import _ from "lodash";
 
 Vue.use(VueRouter);
 
 const routes = [
-  {
-    path: "/",
-    redirect: "/admin"
-  },
   {
     path: "/login",
     name: "Login",
@@ -32,9 +30,18 @@ const routes = [
       {
         path: "order",
         name: "Order",
-        component: () => import("@/views/Admin/Order.vue")
+        component: () => import("@/views/Admin/Order.vue"),
+        meta: {
+          admin: true,
+          employee: true,
+          visitor: false
+        }
       }
     ]
+  },
+  {
+    path: "*",
+    redirect: "/admin/restaurant"
   }
 ];
 
@@ -42,6 +49,21 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  const role = _.get(getStorage("role"), "role", "");
+  console.log(to);
+  console.log(from);
+  console.log(next);
+  console.log("121212", role);
+  if (!role && to.name !== "Login") {
+    next({ name: "Login" });
+  } else if (role == "visitor" && to.name == "Oder") {
+    next({ name: "Restaurant" });
+  } else {
+    next();
+  }
 });
 
 export default router;

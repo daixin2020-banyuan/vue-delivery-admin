@@ -74,3 +74,11 @@ export const computeArr = arr => {
   }
   return newArr;
 };
+
+export function permission() {
+  const role = getStorage("role").role || "";
+
+  if (role !== "admin") {
+    return true;
+  }
+}
