@@ -53,15 +53,20 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const role = _.get(getStorage("role"), "role", "");
-  console.log(to);
-  console.log(from);
-  console.log(next);
-  console.log("121212", role);
+  console.log("====to====", to.name);
+  console.log("====from====", from.name);
+  console.log("====next====", next.name);
+  console.log("role=======>", role);
   if (!role && to.name !== "Login") {
+    console.log(1);
     next({ name: "Login" });
-  } else if (role == "visitor" && to.name == "Oder") {
+  } else if (role == "visitor" && to.name == "Order") {
+    console.log(2);
+
     next({ name: "Restaurant" });
   } else {
+    console.log(3);
+
     next();
   }
 });

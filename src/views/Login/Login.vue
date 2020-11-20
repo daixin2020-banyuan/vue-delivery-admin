@@ -36,6 +36,26 @@
         </el-form-item>
       </el-form>
     </div>
+
+    <el-drawer :visible.sync="isVisible">
+      <el-card class="box-card">
+        <p>管理员</p>
+        <p>username: admin</p>
+        <p>password: 随意</p>
+      </el-card>
+
+      <el-card class="box-card">
+        <p>部门员工</p>
+        <p>username: employee</p>
+        <p>password: 随意</p>
+      </el-card>
+
+      <el-card class="box-card">
+        <p>游客</p>
+        <p>username: visitor</p>
+        <p>password: 随意</p>
+      </el-card>
+    </el-drawer>
   </div>
 </template>
 
@@ -48,7 +68,8 @@ export default {
       ruleForm: {
         pass: "",
         username: ""
-      }
+      },
+      isVisible: false
     };
   },
   methods: {
@@ -72,7 +93,7 @@ export default {
       this.$refs.ruleForm.resetFields();
     },
     showDetails() {
-      console.log("showDetails");
+      this.isVisible = true;
     }
   }
 };
@@ -84,5 +105,9 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100vh;
+}
+.box-card {
+  width: 280px;
+  margin: 20px auto 0 auto;
 }
 </style>
